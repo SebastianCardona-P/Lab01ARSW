@@ -1,5 +1,8 @@
 package edu.eci.arsw.math;
 
+import java.util.ArrayList;
+import java.util.List;
+
 ///  <summary>
 ///  An implementation of the Bailey-Borwein-Plouffe formula for calculating hexadecimal
 ///  digits of pi.
@@ -12,99 +15,50 @@ public class PiDigits {
     private static double Epsilon = 1e-17;
 
     
-    /**
-     * Returns a range of hexadecimal digits of pi.
+   /**
+     * Returns a range of hexadecimal digits of pi using multiple threads.
      * @param start The starting location of the range.
-     * @param count The number of digits to return
+     * @param count The number of digits to return.
+     * @param numThreads The number of threads to use.
      * @return An array containing the hexadecimal digits.
      */
-    public static byte[] getDigits(int start, int count) {
-        if (start < 0) {
-            throw new RuntimeException("Invalid Interval");
+    public static byte[] getDigits(int start, int count, int numThreads) {
+        if (start < 0 || count < 0 || numThreads <= 0) {
+            throw new RuntimeException("Invalid parameters");
         }
 
-        if (count < 0) {
-            throw new RuntimeException("Invalid Interval");
+        int rangePerThread = count / numThreads; // Divide el trabajo entre los hilos
+        int remainingDigits = count % numThreads; // Digitos que sobran
+
+        List<MiniPiDigits> threads = new ArrayList<>();
+        byte[] result = new byte[count];
+
+        // Crear los hilos
+        for (int i = 0; i < numThreads; i++) {
+            int threadStart = start + i * rangePerThread;
+            int threadCount = rangePerThread + (i == numThreads - 1 ? remainingDigits : 0);
+            MiniPiDigits thread = new MiniPiDigits(threadStart, threadCount);
+            threads.add(thread);
         }
 
-        byte[] digits = new byte[count];
-        double sum = 0;
+        for(MiniPiDigits thread : threads){
+            thread.start();
+        }
 
-        for (int i = 0; i < count; i++) {
-            if (i % DigitsPerSum == 0) {
-                sum = 4 * sum(1, start)
-                        - 2 * sum(4, start)
-                        - sum(5, start)
-                        - sum(6, start);
-
-                start += DigitsPerSum;
+        // Esperar a que todos los hilos terminen
+        for (MiniPiDigits thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException("Thread interrupted", e);
             }
-
-            sum = 16 * (sum - Math.floor(sum));
-            digits[i] = (byte) sum;
         }
 
-        return digits;
-    }
-
-    /// <summary>
-    /// Returns the sum of 16^(n - k)/(8 * k + m) from 0 to k.
-    /// </summary>
-    /// <param name="m"></param>
-    /// <param name="n"></param>
-    /// <returns></returns>
-    private static double sum(int m, int n) {
-        double sum = 0;
-        int d = m;
-        int power = n;
-
-        while (true) {
-            double term;
-
-            if (power > 0) {
-                term = (double) hexExponentModulo(power, d) / d;
-            } else {
-                term = Math.pow(16, power) / d;
-                if (term < Epsilon) {
-                    break;
-                }
-            }
-
-            sum += term;
-            power--;
-            d += 8;
-        }
-
-        return sum;
-    }
-
-    /// <summary>
-    /// Return 16^p mod m.
-    /// </summary>
-    /// <param name="p"></param>
-    /// <param name="m"></param>
-    /// <returns></returns>
-    private static int hexExponentModulo(int p, int m) {
-        int power = 1;
-        while (power * 2 <= p) {
-            power *= 2;
-        }
-
-        int result = 1;
-
-        while (power > 0) {
-            if (p >= power) {
-                result *= 16;
-                result %= m;
-                p -= power;
-            }
-
-            power /= 2;
-
-            if (power > 0) {
-                result *= result;
-                result %= m;
-            }
+        // Combinar los resultados de los hilos
+        int pos = 0;
+        for (MiniPiDigits thread : threads) {
+            System.arraycopy(thread.getDigits(), 0, result, pos, thread.getDigits().length);
+            pos += thread.getDigits().length;
         }
 
         return result;

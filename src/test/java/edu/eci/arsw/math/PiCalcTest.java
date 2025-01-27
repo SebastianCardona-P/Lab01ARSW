@@ -5,9 +5,9 @@
  */
 package edu.eci.arsw.math;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -37,9 +37,11 @@ public class PiCalcTest {
             0x4, 0x5, 0x2, 0x8, 0x2, 0x1, 0xE, 0x6,
             0x3, 0x8, 0xD, 0x0, 0x1, 0x3, 0x7, 0x7,};
 
+        int numThreads = 4;
+
         for (int start = 0; start < expected.length; start++) {
             for (int count = 0; count < expected.length - start; count++) {
-                byte[] digits = PiDigits.getDigits(start, count);
+                byte[] digits = PiDigits.getDigits(start, count, numThreads);
                 assertEquals(count, digits.length);
 
                 for (int i = 0; i < digits.length; i++) {
