@@ -102,7 +102,9 @@ public class MiniPiDigits extends Thread {
         return result;
     }
 
-
+    /*
+     * Returns the hexadecimal digits.
+     */
     public byte[] getDigits() {
         return digits;
     }
