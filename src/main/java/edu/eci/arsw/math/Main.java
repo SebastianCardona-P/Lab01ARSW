@@ -9,7 +9,7 @@ public class Main {
         long startTime = System.currentTimeMillis();
         
         // Calcular pi con el número n de hilos
-        byte[] digits = PiDigits.getDigits(1, 100000, 250);
+        byte[] digits = PiDigits.getDigits(1, 1000000, 200);
         
         long endTime = System.currentTimeMillis();
                 
