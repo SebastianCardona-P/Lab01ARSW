@@ -16,6 +16,7 @@ public class Main {
         // Imprimir resultado
         System.out.println(bytesToHex(digits));
         System.out.println("Tiempo de ejecución: " + (endTime - startTime) + "ms");
+        System.out.println("Procesadores (cores): "+ availableProcessors);
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
