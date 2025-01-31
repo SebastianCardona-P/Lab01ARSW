@@ -117,12 +117,14 @@ Con 200 hilos, el tiempo de ejecución fue mejor que con 500 hilos debido a que 
 #### Pregunta 4: ¿Cómo se comporta la solución usando tantos hilos de procesamiento como núcleos comparados con el resultado de usar el doble de estos?
 
 **Respuesta:**  
-Usar tantos hilos como núcleos es más eficiente porque cada hilo puede ejecutarse en un núcleo diferente, minimizando el overhead y la contención de recursos. En cambio, usar el doble de hilos obliga al sistema operativo a realizar multiplexación entre hilos, lo que introduce overhead y reduce el rendimiento debido a la competencia por los recursos de la CPU y la memoria.
+Usar tantos hilos como núcleos es más eficiente porque cada hilo puede ejecutarse en un núcleo diferente, minimizando el overhead y la contención de recursos. No obstante, usar el doble de hilos obliga al sistema operativo a realizar multiplexación entre hilos, aunque es mínimo y el overhead también permitinedo que mientras un hilo este esperando acceso a la memoria, otro a la vez se este ejecutando, sin embargo la mejora entre más hilos es infiníta, si se usa más hilos, el overhead aumenta, haciendo que se gaste más recursos en el cambio de contexto en lugar de en el procesamiento del problema.
 
 #### Pregunta 5: Si en lugar de 500 hilos en una sola CPU, se pudiera usar 1 hilo en cada una de 500 máquinas hipotéticas, ¿la ley de Amdahl se aplicaría mejor? Si en lugar de esto se usaran c hilos en 500/c máquinas distribuidas, ¿se mejoraría?
 
 **Respuesta:**  
-La ley de Amdahl sigue aplicándose de la misma manera, ya que el límite teórico depende de la fracción paralelizable del algoritmo (P). Sin embargo, al distribuir los hilos en varias máquinas, se reduce el overhead y la contención de recursos, lo que mejora el rendimiento práctico. Si se usan 500 hilos en 500 máquinas, la contención por recursos como la memoria RAM y la CPU sería menor, lo que resultaría en una mayor eficiencia en comparación con usar 500 hilos en una sola CPU.
+La ley de Amdahl se aplicaría mejor con 1 hilo en 500 máquinas, debido a que dividir el proceso del cálculo de los decimales de pi entre 500 máquinas, minimiza el overhead y la competencia por acceder a memoria, sin mencionar que se minimiza también el cambio de contexto entre hilos, por lo que, el posible retraso se vería en la comunicación entre máquinas y como se juntan los resultados. 
+
+Con c hilos en 500/c máquinas, el sistema aprovecharía mucho mejor la paralización, puesto que cada maquina usa todos sus hilos del núcleo, minimizando el overhead en cada máquina, por lo que la respuesta de nuevo se daría mucho más rápido, no obstante, la limitante sería la misma, la comunicación entre cada maquina se debe manejar con cuidado, ya que, si no se hace adecuadamente, puede afectar el rendimiento al entregar el resultado final. 
 
 ---
 
